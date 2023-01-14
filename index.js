@@ -2,65 +2,66 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const ejs = require('ejs');
-const { url } = require('inspector');
 
 mongoose.set('strictQuery',false);
 const app = express();
 app.set('view engine','ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
-mongoose.connect("mongodb+srv://admin-naman:namansoni99@cluster0.nwubt4c.mongodb.net/submitDB", {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect("mongodb://127.0.0.1/submitDB",{useNewUrlParser: true});
 
 const submitschema = new mongoose.Schema({
-    name: String,
-    class: String,
+    email: String,
+    password: String,
     RollNum: Number
 });
 const Submit = mongoose.model("Submit",submitschema);
 
 Submit.updateOne({name: "Naman"}, {$set: {RollNum: 15}})
 
-
-// Submit.deleteOne({name: "Naman"},function(err){
-// if(err){
-//     console.log(err)
-// }else{
-//     console.log("Successfully deleted")
-// }
-// });
-
-app.get("/",function(req,res){
-    res.sendFile(__dirname + "/index.html");
+app.get("/", function(req,res){
+   res.sendFile(__dirname + "/home.html")
 });
-app.post("/",function(req,res){
-    res.send("Thank you for your response");
-   let total = {
-     name : req.body.Name,
-     claass : req.body.Class,
-     rollno : req.body.Rollno
-   };
+
+app.post("/signup", function(req,res){
+    res.sendFile(__dirname + "/signup.html");
+});
+
+app.post("/signupsubmit",function(req,res){
     const submit = new Submit({
-    name: total.name,
-    class: total.claass,
-    RollNum: total.rollno
+    email: req.body.Email,
+    password: req.body.Password,
+    RollNum: req.body.Rollno
 });
-submit.save();
-app.get("/:topic",function(req,res){
-    let topic = (req.params.topic);
-
-    if(total.name === topic){
-        res.send("Hello");
+submit.save(function(err){
+    if(err){
+        console.log(err);
     }else{
-        console.log("Doesn't exist");
+        res.sendFile(__dirname + "/home.html")
     }
 });
 });
-let port = process.env.PORT;
-if (port == null || port == "") {
-  port = 3000;
-}
-app.listen(port);
 
-app.listen(port, function(){
+app.post("/loginsubmit", function(req,res){
+    username =  req.body.Email;
+    password =  req.body.Password;
+    Submit.findOne({email: username}, function(err, foundUser){
+        if(err){
+            alert("your password is wrong")
+        } else{
+            if(foundUser) {
+                if(foundUser.password === password){
+                   res.render("loginsubmit")
+                }
+            }
+        }
+    })
+})
+
+app.post("/login", function(req,res){
+    res.sendFile(__dirname + "/login.html");
+});
+
+app.listen(3000, function(){
     console.log("Server is running")
   });
