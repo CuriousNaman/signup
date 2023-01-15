@@ -20,7 +20,7 @@ const Submit = mongoose.model("Submit",submitschema);
 Submit.updateOne({name: "Naman"}, {$set: {RollNum: 15}})
 
 app.get("/", function(req,res){
-   res.sendFile(__dirname + "/home.html")
+   res.sendFile(__dirname + "/index.html")
 });
 
 app.post("/signup", function(req,res){
@@ -37,7 +37,7 @@ submit.save(function(err){
     if(err){
         console.log(err);
     }else{
-        res.sendFile(__dirname + "/home.html")
+        res.sendFile(__dirname + "/index.html")
     }
 });
 });
